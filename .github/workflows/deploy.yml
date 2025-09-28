@@ -20,6 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       server-ip: ${{steps.tf.outputs.SERVER_IP}}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -85,7 +86,7 @@ jobs:
 
       - name: Ensure remote app dir exists
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p $REMOTE_APP_DIR"
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ needs.build-infra.outputs.server-ip }} "mkdir -p $REMOTE_APP_DIR"
       
       - name: Create .env and send to server
         run: |
@@ -95,11 +96,11 @@ jobs:
           PASSWORD=${{ secrets.APP_PASSWORD }}
           PORT=${{ secrets.APP_PORT }}
           EOF
-          scp -o StrictHostKeyChecking=no .env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:$REMOTE_APP_DIR/.env
+          scp -o StrictHostKeyChecking=no .env ubuntu@${{ needs.build-infra.outputs.server-ip }}:$REMOTE_APP_DIR/.env
 
       - name: Deploy - pull image and restart container
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ needs.build-infra.outputs.server-ip }} << 'EOF'
             IMAGE="${{ secrets.IMAGE_NAME }}:latest"
             CONTAINER_NAME="dockerized-service"
             cd ~/dockerize-node-app

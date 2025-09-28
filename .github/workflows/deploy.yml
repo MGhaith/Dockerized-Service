@@ -86,6 +86,16 @@ jobs:
       - name: Ensure remote app dir exists
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p $REMOTE_APP_DIR"
+      
+      - name: Create .env and send to server
+        run: |
+          cat > .env <<EOF
+          SECRET_MESSAGE=${{ secrets.SECRET_MESSAGE }}
+          USERNAME=${{ secrets.APP_USERNAME }}
+          PASSWORD=${{ secrets.APP_PASSWORD }}
+          PORT=${{ secrets.APP_PORT }}
+          EOF
+          scp -o StrictHostKeyChecking=no .env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:$REMOTE_APP_DIR/.env
   
   cleanup:
     runs-on: ubuntu-latest

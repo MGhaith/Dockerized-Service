@@ -96,6 +96,24 @@ jobs:
           PORT=${{ secrets.APP_PORT }}
           EOF
           scp -o StrictHostKeyChecking=no .env ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:$REMOTE_APP_DIR/.env
+
+      - name: Deploy - pull image and restart container
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            IMAGE="${{ secrets.IMAGE_NAME }}:latest"
+            CONTAINER_NAME="dockerized-service"
+            cd ~/dockerize-node-app
+
+            docker pull "$IMAGE"
+
+            docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+
+            docker run -d --name "$CONTAINER_NAME" \
+              --env-file .env \
+              -p ${PORT:-3000}:3000 \
+              --restart unless-stopped \
+              "$IMAGE"
+          EOF
   
   cleanup:
     runs-on: ubuntu-latest

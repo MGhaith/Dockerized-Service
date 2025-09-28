@@ -72,6 +72,8 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    env:
+      REMOTE_APP_DIR: ~/dockerize-node-app
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -80,6 +82,10 @@ jobs:
         uses: webfactory/ssh-agent@v0.8.1
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Ensure remote app dir exists
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p $REMOTE_APP_DIR"
   
   cleanup:
     runs-on: ubuntu-latest

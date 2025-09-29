@@ -30,3 +30,6 @@ Environment variables required:
         ```bash
         docker run -p 3000:3000 -e PORT=3000 -e BASIC_AUTH_USER=user -e BASIC_AUTH_PASS=pass -e SECRET_MESSAGE=secret dockerized-service:latest
         ```
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/MGhaith/Dockerized-Service/blob/main/LICENSE) file for details.

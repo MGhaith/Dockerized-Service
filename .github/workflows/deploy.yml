@@ -19,7 +19,7 @@ jobs:
   build-infra:
     runs-on: ubuntu-latest
     outputs:
-      server_ip: ${{ steps.tf.outputs.SERVER_IP }}
+      server_ip: ${{ steps.tf.outputs.server_ip }}
 
     steps:
       - name: Checkout code
@@ -46,7 +46,10 @@ jobs:
       - name: Get server IP
         id: tf
         working-directory: ./terraform
-        run: echo "SERVER_IP=$(terraform output -raw server_ip)" >> $GITHUB_OUTPUT
+        run: echo "server_ip=$(terraform output -raw server_ip)" >> "$GITHUB_OUTPUT"
+      
+      - name: Debug print server_ip
+        run: echo "SERVER_IP is ${{ steps.tf.outputs.server_ip }}"
 
   build-and-push:
     runs-on: ubuntu-latest

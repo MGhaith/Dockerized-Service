@@ -19,7 +19,7 @@ resource "aws_instance" "dockerized-service" {
     systemctl start docker
     systemctl enable docker
     usermod -aG docker ubuntu
-    reboot
+    systemctl restart docker
   EOF
 
   tags = {

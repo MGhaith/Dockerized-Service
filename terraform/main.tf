@@ -12,6 +12,15 @@ resource "aws_instance" "dockerized-service" {
   instance_type = "t3.micro"
   key_name      = aws_key_pair.default.key_name
 
+  user_data = <<-EOF
+    #!/bin/bash
+    apt-get update -y
+    apt-get install -y docker.io
+    systemctl start docker
+    systemctl enable docker
+    usermod -aG docker ubuntu
+  EOF
+
   tags = {
     Name = "dockerized-service-server"
   }

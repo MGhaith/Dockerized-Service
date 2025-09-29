@@ -87,6 +87,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Debug output from terraform
+        run: echo "Server IP is ${{ needs.terraform.outputs.server_ip }}"
+
       - name: Ensure remote app dir exists
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ needs.terraform.outputs.server_ip }} "mkdir -p $REMOTE_APP_DIR"

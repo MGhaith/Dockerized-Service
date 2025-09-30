@@ -1,7 +1,7 @@
 # Dockerized Service (WIP)
 Deploy a Dockerized Node.js Service using GitHub Actions
 
-## Project structure
+## Project Structure
 ```
 ├── .github
 │   └── workflows
@@ -11,6 +11,17 @@ Deploy a Dockerized Node.js Service using GitHub Actions
 ├── node_service            # Node.js application code
 └── terraform               # Terraform configuration files    
 ```
+
+### Infrastructure Destruction
+To destroy the infrastructure created by this project, follow these steps:
+1. Navigate to the project directory.
+2. Ensure you have Terraform installed and configured with AWS credentials.
+3. Run the following command to destroy the resources:
+    ```
+    cd terraform
+    terraform destroy
+    ```
+3. Enter you public key content from `~/.ssh/id_rsa.pub` and confirm the destruction when prompted.
 
 ## Node.js Service
 The Node.js service is an Express app with two endpoints:

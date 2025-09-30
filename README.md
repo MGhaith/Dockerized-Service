@@ -151,6 +151,11 @@ You need this repository to store the project code, trigger the deployment workf
     ```
 2. Check the Actions tab in your repository to monitor the deployment progress.
 
+## Verification
+1. Once the deployment is complete, check the Actions tab in your repository to verify that the deployment job has passed.
+2. Access the deployed service using the public IP outputted by **Terraform** or the **AWS EC2 Console** with the port (e.g., `http://<public-ip>:<port>`). You should see the “Hello, world!” message.
+3. Try accessing the protected `/secret` endpoint using the Basic Auth credentials you set **GitHub Secrets**. You should receive the `SECRET_MESSAGE` value.
+
 ### Infrastructure Destruction
 To destroy the infrastructure created by this project, follow these steps:
 1. Navigate to the project directory.

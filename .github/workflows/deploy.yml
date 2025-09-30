@@ -92,8 +92,8 @@ jobs:
         run: |
           cat > .env <<EOF
             SECRET_MESSAGE=${{ secrets.SECRET_MESSAGE }}
-            USERNAME=${{ secrets.APP_USERNAME }}
-            PASSWORD=${{ secrets.APP_PASSWORD }}
+            BASIC_AUTH_USER=${{ secrets.APP_USERNAME }}
+            BASIC_AUTH_PASS=${{ secrets.APP_PASSWORD }}
             PORT=${{ secrets.APP_PORT }}
           EOF
           scp -o StrictHostKeyChecking=no .env ubuntu@${{ needs.terraform.outputs.server_ip }}:$REMOTE_APP_DIR/.env

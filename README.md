@@ -1,6 +1,17 @@
 # Dockerized Service (WIP)
 Deploy a Dockerized Node.js Service using GitHub Actions
 
+## Project structure
+```
+├── .github
+│   └── workflows
+│       └── deploy.yml      # Github Actions CI/CD workflow   
+├── Dockerfile              # Dockerfile for the Node.js service
+├── .dockerignore           # Docker ignore file
+├── node_service            # Node.js application code
+└── terraform               # Terraform configuration files    
+```
+
 ## Node.js Service
 The Node.js service is an Express app with two endpoints:
 

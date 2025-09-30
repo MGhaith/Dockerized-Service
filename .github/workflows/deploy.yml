@@ -91,10 +91,10 @@ jobs:
       - name: Create .env and send to server
         run: |
           cat > .env <<EOF
-          SECRET_MESSAGE=${{ secrets.SECRET_MESSAGE }}
-          USERNAME=${{ secrets.APP_USERNAME }}
-          PASSWORD=${{ secrets.APP_PASSWORD }}
-          PORT=${{ secrets.APP_PORT }}
+            SECRET_MESSAGE=${{ secrets.SECRET_MESSAGE }}
+            USERNAME=${{ secrets.APP_USERNAME }}
+            PASSWORD=${{ secrets.APP_PASSWORD }}
+            PORT=${{ secrets.APP_PORT }}
           EOF
           scp -o StrictHostKeyChecking=no .env ubuntu@${{ needs.terraform.outputs.server_ip }}:$REMOTE_APP_DIR/.env
           cat .env

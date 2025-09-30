@@ -1,4 +1,4 @@
-# Dockerized Service (WIP)
+# Dockerized Service
 Deploy a Dockerized Node.js Service using GitHub Actions
 
 ## Project Structure

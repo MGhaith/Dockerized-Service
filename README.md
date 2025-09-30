@@ -12,6 +12,145 @@ Deploy a Dockerized Node.js Service using GitHub Actions
 └── terraform               # Terraform configuration files    
 ```
 
+## Deployment
+### Prerequisites
+
+- [GitHub account](https://github.com/)
+- [AWS account](https://console.aws.amazon.com)
+- SSH key pair generated.
+
+### Setup
+#### 1. Clone the project's GitHub repository.
+
+Clone the repository:
+   ```bash
+   git clone https://github.com/MGhaith/Dockerized-Service.git
+   cd Dockerized-Service
+   ```
+
+#### 2. Create a Github Repository and Add Secrets
+You need this repository to store the project code, trigger the deployment workflow, and store secrets.
+
+1. Create a new repository on [GitHub](https://github.com) for the project.
+2. Generate an SSH key pair, if you don't one already.
+   ```bash
+   ssh-keygen -t rsa -P "" -f ~/.ssh/id_rsa
+   ```
+3. Create a new secret in the repository settings (Settings > Secrets and variables > Actions > New repository secret).
+    - Docker Hub secrets:
+        - `DOCKERHUB_USERNAME` — Docker Hub username (or registry user)
+        - `DOCKERHUB_TOKEN` — Docker Hub access token (or password)
+        - `IMAGE_NAME` — e.g. yourdockerhubusername/dockerized-service
+    - SSH secrets:
+        - `SSH_PRIVATE_KEY` — Your private SSH key (contents of `~/.ssh/id_rsa`)
+        - `SSH_PUBLIC_KEY` — Your public SSH key (contents of `~/.ssh/id_rsa.pub`)
+    - .env variables:
+        - `SECRET_MESSAGE`: secret text returned on `/secret`
+        - `APP_USERNAME`: username for Basic Auth
+        - `APP_PASSWORD`: password for Basic Auth
+        - `APP_PORT` — port exposed on the server (optional; default 80 or 3000)
+    
+#### 3. Create IAM Role for OIDC
+1. Log in to the [AWS Management Console](https://console.aws.amazon.com/).
+2. Navigate to the IAM service.
+3. Create a new `Web identity` role
+    - Trusted entity type: `Web identity`
+    - Identity provider: `token.actions.githubusercontent.com`
+    - Audience: `sts.amazonaws.com`
+    - GitHub organization: `Your Github Username` or `Your Github Organization`
+    - GitHub repository: `Your repository name`
+4. In the new role you created add the following inline policy:
+    ```json
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "EC2FullAccess",
+                "Effect": "Allow",
+                "Action": "ec2:*",
+                "Resource": "*"
+            },
+            {
+                "Sid": "STSGetCallerIdentity",
+                "Effect": "Allow",
+                "Action": "sts:GetCallerIdentity",
+                "Resource": "*"
+            },
+            {
+                "Sid": "TerraformS3Backend",
+                "Effect": "Allow",
+                "Action": [
+                    "s3:GetObject",
+                    "s3:PutObject",
+                    "s3:DeleteObject",
+                    "s3:ListBucket"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::dockerized-service-terraform-state-075091538636",
+                    "arn:aws:s3:::dockerized-service-terraform-state-075091538636/*"
+                ]
+            },
+            {
+                "Sid": "TerraformDynamoDBLock",
+                "Effect": "Allow",
+                "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:DeleteItem",
+                    "dynamodb:UpdateItem"
+                ],
+                "Resource": "arn:aws:dynamodb:us-east-1:075091538636:table/dockerized-service-terraform-locks"
+            }
+        ]
+    }
+    ```
+5. Copy the Role ARN, we will need it later.
+
+#### 4. Create S3 bucket and DynamoDB table for Terraform state
+1. Log in to the [AWS Management Console](https://console.aws.amazon.com/).
+2. Navigate to the S3 service and create a new S3 bucket.
+    - Bucket name: `dockerized-service-terraform-state-<Your AWS Account ID>` (Replace `<Your AWS Account ID>` with your AWS Account ID)
+    - Region: `us-east-1`
+    - Enable versioning
+    - Enable public access block
+    - Create bucket
+3. Navigate to the S3 service and create a new DynamoDB table for state locking
+    - Table name: `dockerized-service-terraform-locks`
+    - Partition key: `LockID` (String)
+    - Create table
+4. update `terraform\backend.tf` with your bucket name and DynamoDB table name.
+    ``` hcl
+    terraform {
+      required_version = ">= 1.13.0"
+  
+      backend "s3" {
+        bucket         = "dockerized-service-terraform-state-<Your AWS Account ID>" # Change this
+        key            = "global/terraform.tfstate"                     
+        region         = "us-east-1"                                    
+        dynamodb_table = "dockerized-service-terraform-locks" # And this 
+        encrypt        = true                                           
+      }
+    }
+    ```
+
+#### 5. Update CI/CD Workflow file.
+1. In `.github\workflows\deploy_service.yml`, change the **role-to-assume** value to your role ARN fot both the `terraform` and `cleanup` jobs.
+    ``` yml
+    - name: Configure AWS credentials via OIDC (Terraform)
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::<Account-ID>:role/<Role-Name> # Change this to your role ARN
+        aws-region: us-east-1
+    ```
+#### 6. Push changes to trigger deployment.
+1. Commit and push your changes to the `main` branch of the repository you created.
+    ```
+    git add .
+    git commit -m "Deploy Node.js service"
+    git push origin main
+    ```
+2. Check the Actions tab in your repository to monitor the deployment progress.
+
 ### Infrastructure Destruction
 To destroy the infrastructure created by this project, follow these steps:
 1. Navigate to the project directory.

@@ -98,6 +98,15 @@ jobs:
           EOF
           scp -o StrictHostKeyChecking=no .env ubuntu@${{ needs.terraform.outputs.server_ip }}:$REMOTE_APP_DIR/.env
 
+      - name: Check Docker version on server
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ needs.terraform.outputs.server_ip }} << 'EOF'
+            echo "Checking Docker installation..."
+            docker --version || { echo "Docker not found or permission denied"; exit 1; }
+            whoami
+            groups
+          EOF
+          
       - name: Deploy - pull image and restart container
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ needs.terraform.outputs.server_ip }} << 'EOF'

@@ -202,5 +202,14 @@ Environment variables required:
             docker run -p 3000:3000 -e PORT=3000 -e BASIC_AUTH_USER=user -e BASIC_AUTH_PASS=pass -e SECRET_MESSAGE=secret dockerized-service:latest
             ```
 
+## GitHub Actions Workflow
+
+The CI/CD pipeline is defined in `.github/workflows/deploy_service.yml` and orchestrates the full build–push–deploy cycle:
+
+1. **Terraform** – spins up an EC2 instance and outputs its public IP.  
+2. **Build & Push** – builds the Docker image, tags it with the commit SHA and `latest`, then pushes to Docker Hub.  
+3. **Deploy** – SSHs into the new EC2 instance, uploads the `.env` file, pulls the fresh image and starts the container.  
+4. **Cleanup** – if any previous job fails, the EC2 instance is automatically destroyed to avoid orphaned resources.
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/MGhaith/Dockerized-Service/blob/main/LICENSE) file for details.

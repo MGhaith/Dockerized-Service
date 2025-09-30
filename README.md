@@ -36,22 +36,27 @@ Environment variables required:
 - `SECRET_MESSAGE`: secret text returned on `/secret`
 
 ### Local testing:
-- using Node:
+1. Copy the `.env.example` file to `.env` and update the values.
     ```bash
-    cd node_service
-    npm install
-    node service.js
+    cp .env.example .env
     ```
-- Using Docker:
-    For this you need docker installed on your machine.
-    1. Build the Docker image:
+2. Pick a testing method:
+    - using Node:
         ```bash
-        docker build -t dockerized-service:latest .
-        ``` 
-    2. Run the Docker container:
-        ```bash
-        docker run -p 3000:3000 -e PORT=3000 -e BASIC_AUTH_USER=user -e BASIC_AUTH_PASS=pass -e SECRET_MESSAGE=secret dockerized-service:latest
+        cd node_service
+        npm install
+        node service.js
         ```
+    - Using Docker:
+        For this you need docker installed on your machine.
+        1. Build the Docker image:
+            ```bash
+            docker build -t dockerized-service:latest .
+            ``` 
+        2. Run the Docker container:
+            ```bash
+            docker run -p 3000:3000 -e PORT=3000 -e BASIC_AUTH_USER=user -e BASIC_AUTH_PASS=pass -e SECRET_MESSAGE=secret dockerized-service:latest
+            ```
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/MGhaith/Dockerized-Service/blob/main/LICENSE) file for details.

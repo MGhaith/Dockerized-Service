@@ -98,19 +98,10 @@ jobs:
           EOF
           scp -o StrictHostKeyChecking=no .env ubuntu@${{ needs.terraform.outputs.server_ip }}:$REMOTE_APP_DIR/.env
 
-      - name: Wait for Docker to be ready
+      - name: Wait for Docker
         run: |
-          for i in {1..10}; do
-            ssh -o StrictHostKeyChecking=no ubuntu@${{ needs.terraform.outputs.server_ip }} << 'EOF'
-              groups | grep -q docker && docker --version && exit 0 || exit 1
-            EOF
-            if [ $? -eq 0 ]; then
-              echo "Docker ready!"
-              break
-            fi
-            echo "Waiting for Docker..."
-            sleep 15
-          done
+          echo "Waiting 30 seconds for instance and Docker to be ready..."
+          sleep 30
 
       - name: Deploy - pull image and restart container
         run: |

@@ -97,7 +97,6 @@ jobs:
             PORT=${{ secrets.APP_PORT }}
           EOF
           scp -o StrictHostKeyChecking=no .env ubuntu@${{ needs.terraform.outputs.server_ip }}:$REMOTE_APP_DIR/.env
-          cat .env
 
       - name: Wait for Docker
         run: |

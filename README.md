@@ -136,7 +136,7 @@ You need this repository to store the project code, trigger the deployment workf
 5. Copy the Role ARN, we will need it later.
 
 #### 5. Update CI/CD Workflow file.
-1. In `.github\workflows\deploy_service.yml`, change the **role-to-assume** value to your role ARN fot both the `terraform` and `cleanup` jobs.
+1. In `.github\workflows\deploy_service.yml`, change the **role-to-assume** value to your role ARN for both the `terraform` and `cleanup` jobs.
     ``` yml
     - name: Configure AWS credentials via OIDC (Terraform)
       uses: aws-actions/configure-aws-credentials@v4
